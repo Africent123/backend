@@ -8,6 +8,9 @@ const uidgen = new UIDGenerator();
 const passport = require("passport");
 const compress_images = require("compress-images");
 
+// importing db configurations
+const dbconfig = require('../config/dbconfig');
+
 // to generate unique token for each uploaded file
 let token;
 uidgen.generate().then(uid => (token = uid));
@@ -17,7 +20,7 @@ const Movie = require("../models/Movie");
 const GridFsStorage = require("multer-gridfs-storage");
 
 const storage = new GridFsStorage({
-  url: "mongodb://127.0.0.1:27017/kannywoodtv-dev",
+  url: dbconfig.dburl,
   file: (req, file) => {
     //console.log("file received", req.files)
 
@@ -33,7 +36,7 @@ const upload = multer({
 
 // file upload url files/upload
 
-router.post("/", upload.array("file", 2), (req, res) => {
+router.post("/movies", upload.array("file", 2), (req, res) => {
   const movie = new Movie({
     MovieName: req.body.name,
     description: req.body.Description,

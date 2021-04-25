@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const router = express.Router();

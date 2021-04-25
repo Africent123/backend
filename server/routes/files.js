@@ -3,12 +3,21 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Grid = require('gridfs-stream');
 
-
+// importing db configurations
+const dbconfig = require('../config/dbconfig');
 
 const Movie = require('../models/Movie');
 
+
+const conn = mongoose.createConnection(dbconfig.dburl, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true
+});
+
 let gfs = Grid;
-const conn = mongoose.createConnection('mongodb://127.0.0.1:27017/kannywoodtv-dev');
+
 conn.once('open', function() {
     gfs = Grid(conn.db, mongoose.mongo);
 });
@@ -64,6 +73,7 @@ if(req.headers['range']){
     }
 
   }).pipe(res)
+  console.log(res);
 }
 else{
  

@@ -6,7 +6,7 @@ module.exports = {
         User.findOne({
             _id: req.user.id
         }).then((user) => {
-            console.log(user.isAdmin)
+            //console.log(user.isAdmin)
             if (user.isAdmin === false) {
                 res.send("not authorized")
             } else {

@@ -4,13 +4,16 @@ const router = express.Router();
 const Grid = require('gridfs-stream');
 const Fawn = require('fawn');
 
+// importing db configurations
+const dbconfig = require('../config/dbconfig');
+
 Fawn.init(mongoose)
 
 const Movie = require('../models/Movie');
 const User = require('../models/User');
 
 let gfs
-const conn = mongoose.createConnection('mongodb://127.0.0.1:27017/kannywoodtv-dev');
+const conn = mongoose.createConnection(dbconfig.dburl);
 conn.once('open', function() {
     gfs = Grid(conn.db, mongoose.mongo);
 });

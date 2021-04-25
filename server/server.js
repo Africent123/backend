@@ -1,4 +1,5 @@
 const express = require('express');
+const env = require('dotenv');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -8,11 +9,18 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 
+
+
 const app = express();
+
+//environment variable or you can say constants
+env.config();
 
 
 // importing db configurations
 const dbconfig = require('./config/dbconfig');
+
+
 
 // importing routes
 const user = require('./routes/user');
@@ -27,28 +35,26 @@ const watched = require('./routes/watched');
 //passport config
 require('./config/passport')(passport);
 
-//mongodb connection
+
 mongoose.connect(dbconfig.dburl, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useFindAndModify: false
-    })
-    .then(() => {
-      console.log("DB is up and running");
-    }).catch((err) => {
-      console.log(err);
-    })
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+})
+.then(() => {
+  console.log("Connected to MongoDB Database...");
+}).catch((err) => {
+  console.log(err);
+})
 
-
-
-
-    //compression
 
 //body parser middleware
 app.use(express.urlencoded({
     extended: false
 }))
 app.use(express.json());
+
 
 ///Express session middleware
 app.use(session({
@@ -62,6 +68,7 @@ app.use(session({
         maxAge: null
     }
 }));
+
 
 //passport middleware
 app.use(passport.initialize());
@@ -87,29 +94,31 @@ app.use(function(req, res, next) {
 app.use(morgan('dev'));
 
 //routes
-app.use('/user', user)
-app.use('/upload', upload)
-app.use('/files', file)
-app.use('/movies', movies)
-app.use('/cp', cp)
-app.use('/watched', watched)
+app.use('/api/user', user)
+app.use('/api/upload', upload)
+app.use('/api/files', file)
+app.use('/api/movies', movies)
+app.use('/api/cp', cp)
+app.use('/api/watched', watched)
 
+
+
+//express static middleware
+// Serve static assets if in production
 if(process.env.NODE_ENV === 'production'){
-  app.use(express.static(path.join(__dirname, 'client', 'build')));
+	 // Set static folder
+  // All the javascript and css files will be read and served from this folder
+  app.use(express.static('client/build'));
+  
+  // index.html for all page routes  html or routing and naviagtion
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '..client', 'build', 'index.html'));
   });
 }
 
 
-// app.use(express.static(__dirname + '/public'))
-//
-// // handle every other route with index.html, which will contain
-// // a script tag to your application's JavaScript file(s).
-// app.get('*', function (req, res){
-//   res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
-// })
+const port = process.env.PORT || 5000
 
-
-//server
-app.listen(dbconfig.port, () => console.log(`running on port ${dbconfig.port}`))
+app.listen(port, () =>{
+    console.log(`Server is running on port ${port}`);
+});
